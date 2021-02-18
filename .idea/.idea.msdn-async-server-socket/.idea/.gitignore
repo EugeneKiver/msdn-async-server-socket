@@ -1,0 +1,11 @@
+﻿# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/contentModel.xml
+/.idea.msdn-async-server-socket.iml
+/projectSettingsUpdater.xml
+/modules.xml
+# Datasource local storage ignored files
+/../../../../../../:\work\msdn-async-server-socket\.idea\.idea.msdn-async-server-socket\.idea/dataSources/
+/dataSources.local.xml
