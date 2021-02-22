@@ -4,6 +4,10 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
+// ServerConfig
+using System.Configuration;
+using System.Collections.Specialized;
+
 // State object for reading client data asynchronously  
 public class StateObject
 {
@@ -20,6 +24,36 @@ public class StateObject
     public Socket workSocket = null;
 }
 
+class ServerConfig
+{
+    // Singleton header start
+    private ServerConfig() { }
+
+    private static ServerConfig _instance;
+    //private NameValueCollection sAll;
+    public static ServerConfig GetInstance()
+    {
+        if (_instance == null)
+        {
+            _instance = new ServerConfig();
+            /*_instance.sAll = ConfigurationManager.AppSettings;
+            foreach (string s in _instance.sAll.AllKeys)
+                Console.WriteLine("Key: " + s + " Value: " + sAll.Get(s));
+            Console.ReadLine();
+            */
+        }
+        return _instance;
+    }
+    // Singleton header end
+    
+
+    
+    static void someBusinessLogic()
+    {
+        // ...
+    }
+}
+
 public class AsynchronousSocketListener
 {
     // Thread signal.  
@@ -28,7 +62,7 @@ public class AsynchronousSocketListener
     public AsynchronousSocketListener()
     {
     }
-
+    
     public static void StartListening()
     {
         // Establish the local endpoint for the socket.  
@@ -36,8 +70,22 @@ public class AsynchronousSocketListener
         // running the listener is "host.contoso.com".  
         IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
         IPAddress ipAddress = ipHostInfo.AddressList[0];
-        IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
+        //ServerConfig config = new ServerConfig();
+        //ConfigurationManager.AppSettings;
+        NameValueCollection sAll = ConfigurationManager.AppSettings;
+        Console.WriteLine("--- Conf START ---");
+        foreach (string s in sAll.AllKeys)
+        {
+            Console.WriteLine("Key: " + s + " Value: " + sAll.Get(s));
+        }
 
+        Console.WriteLine("--- Conf END ---");
+        //Console.ReadLine();
+        
+        IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
+        //IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 11000);
+        Console.WriteLine("socket:"+ localEndPoint.Address + ":" + localEndPoint.Port);
+        
         // Create a TCP/IP socket.  
         Socket listener = new Socket(ipAddress.AddressFamily,
             SocketType.Stream, ProtocolType.Tcp);

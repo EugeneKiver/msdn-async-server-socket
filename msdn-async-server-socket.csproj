@@ -6,4 +6,8 @@
         <RootNamespace>msdn_async_server_socket</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0-preview.1.21102.12" />
+    </ItemGroup>
+
 </Project>
