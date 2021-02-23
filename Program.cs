@@ -65,31 +65,35 @@ public class AsynchronousSocketListener
     
     public static void StartListening()
     {
+        //double sinState = 0d;
+        
+        // Load config
+        NameValueCollection appSettings = ConfigurationManager.AppSettings;
+
+        int port = 0;
+        bool loopback = false;
+        
         // Establish the local endpoint for the socket.  
         // The DNS name of the computer  
         // running the listener is "host.contoso.com".  
         IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-        IPAddress ipAddress = ipHostInfo.AddressList[2];
-        
-        
-        //ServerConfig config = new ServerConfig();
-        //ConfigurationManager.AppSettings;
-        NameValueCollection sAll = ConfigurationManager.AppSettings;
-        Console.WriteLine("--- Conf START ---");
-        foreach (string s in sAll.AllKeys)
-        {
-            Console.WriteLine("Key: " + s + " Value: " + sAll.Get(s));
-        }
+        IPAddress ipAddress = ipHostInfo.AddressList[2]; // TODO fix auto address
 
-        Console.WriteLine("--- Conf END ---");
-        //Console.ReadLine();
+        // Override local address with Loopback if configured
+        if (Boolean.TryParse((appSettings.Get("ip_loopback")), out loopback))
+        {
+            Console.WriteLine("Loopback - ON");
+            ipAddress = IPAddress.Loopback;
+        }
         
         // IPv4
-        IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
-        // Parse
-        //IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse("10.0.77.34"), 11000);
-        // Loopback
-        //IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Loopback, 11000);
+        if (!Int32.TryParse((appSettings.Get("ip_port")), out port))
+        {
+            Console.WriteLine("No valid ip_port provided in App.config");
+            return;
+        }
+        
+        IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
         Console.WriteLine("socket:"+ localEndPoint.Address + ":" + localEndPoint.Port);
         
         // Create a TCP/IP socket.  
@@ -106,7 +110,10 @@ public class AsynchronousSocketListener
             {
                 // Set the event to nonsignaled state.  
                 allDone.Reset();
-
+                
+                //sinState = Math.Sin((DateTime.Now.Second -30d)/60d);
+                //Console.WriteLine("sinState:" + sinState);
+                
                 // Start an asynchronous socket to listen for connections.  
                 Console.WriteLine("Waiting for a connection...");
                 listener.BeginAccept(
