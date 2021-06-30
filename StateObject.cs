@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Net.Sockets;
 
-namespace AsyncServer
+namespace CPServer
 {
     // State object for reading client data asynchronously
     public class StateObject
