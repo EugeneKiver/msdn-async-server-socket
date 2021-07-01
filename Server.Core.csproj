@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -8,6 +8,12 @@
 
     <ItemGroup>
       <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Server.Configurator">
+        <HintPath>..\Server.Configurator\bin\Debug\netcoreapp3.1\Server.Configurator.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
