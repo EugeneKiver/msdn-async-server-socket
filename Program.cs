@@ -5,39 +5,10 @@ using System.Text;
 using System.Threading;
 
 // ServerConfig
-using System.Configuration;
-using System.Collections.Specialized;
+using Server.Configurator;
 
 namespace CPServer
 { 
-    class ServerConfig
-    {
-        // Singleton header start
-        private ServerConfig() { }
-
-        private static ServerConfig _instance;
-        //private NameValueCollection sAll;
-        public static ServerConfig GetInstance()
-        {
-            if (_instance == null)
-            {
-                _instance = new ServerConfig();
-                /*_instance.sAll = ConfigurationManager.AppSettings;
-                foreach (string s in _instance.sAll.AllKeys)
-                    Console.WriteLine("Key: " + s + " Value: " + sAll.Get(s));
-                Console.ReadLine();
-                */
-            }
-            return _instance;
-        }
-        // Singleton header end
-    
-        static void someBusinessLogic()
-        {
-            // ...
-        }
-    }
-
     public class AsynchronousSocketListener
     {
         // Thread signal.  
@@ -46,44 +17,20 @@ namespace CPServer
         public AsynchronousSocketListener()
         {
         }
+
+        private static IPEndPoint ConfEndPoint()
+        {
+            ServerConfigurator conf = ServerConfigurator.GetInstance();
+            IPEndPoint localEndPoint = new IPEndPoint(conf.IpAddress, conf.Port);
+            Console.WriteLine("socket:" + localEndPoint.Address + ":" + localEndPoint.Port);
+            return localEndPoint;
+        }
     
         public static void StartListening()
         {
-            //double sinState = 0d;
-        
-            // Load config
-            NameValueCollection appSettings = ConfigurationManager.AppSettings;
-
-            int port = 0;
-            bool loopback = false;
-        
-            // Establish the local endpoint for the socket.  
-            // The DNS name of the computer  
-            // running the listener is "host.contoso.com".  
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[2]; // TODO fix auto address
-
-            // Override local address with Loopback if configured
-            if (Boolean.TryParse((appSettings.Get("ip_loopback")), out loopback))
-            {
-                Console.WriteLine("Loopback - ON");
-                ipAddress = IPAddress.Loopback;
-            }
-        
-            // IPv4
-            if (!Int32.TryParse((appSettings.Get("ip_port")), out port))
-            {
-            Console.WriteLine("No valid ip_port provided in App.config");
-                return;
-            }
-        
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
-            Console.WriteLine("socket:"+ localEndPoint.Address + ":" + localEndPoint.Port);
-        
-            // Create a TCP/IP socket.  
-            Socket listener = new Socket(ipAddress.AddressFamily,
+            IPEndPoint localEndPoint = ConfEndPoint();
+            Socket listener = new Socket(localEndPoint.AddressFamily,
                 SocketType.Stream, ProtocolType.Tcp);
-
             // Bind the socket to the local endpoint and listen for incoming connections.  
             try
             {
@@ -94,9 +41,6 @@ namespace CPServer
                 {
                     // Set the event to nonsignaled state.  
                     allDone.Reset();
-                
-                    //sinState = Math.Sin((DateTime.Now.Second -30d)/60d);
-                    //Console.WriteLine("sinState:" + sinState);
                 
                     // Start an asynchronous socket to listen for connections.  
                     Console.WriteLine("Waiting for a connection...");
@@ -208,7 +152,7 @@ namespace CPServer
         public static int Main(String[] args)
         {
             //AsyncExample.execute();
-
+            
             StartListening();
             return 0;
         }
